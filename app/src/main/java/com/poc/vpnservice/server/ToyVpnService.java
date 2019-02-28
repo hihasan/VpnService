@@ -49,7 +49,7 @@ public class ToyVpnService extends VpnService
         builder.setMtu(1500);
 
         //Address, the IP address of this virtual network port;
-        builder.addAddress("114.255.40.212", 24);
+        builder.addAddress("178.79.175.120", 24);
 
 //        In fact, this is not used to modify the routing table on the Android device.
 //          Instead, it is used to change the NAT table of iptables, only matching the IP packets,
@@ -89,8 +89,10 @@ public class ToyVpnService extends VpnService
         FileOutputStream out = new FileOutputStream(
                 mInterface.getFileDescriptor());
         try {
+
             //c. The UDP channel can be used to pass/get ip package to/from server
             DatagramChannel tunnel = DatagramChannel.open();
+
             // Connect to the server, localhost is used for demonstration only.
             tunnel.connect(new InetSocketAddress("127.0.0.1", 8087));
             //d. Protect this socket, so package send by it will not be feedback to the vpn service.
