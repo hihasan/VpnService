@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">VpnService</string>
     <string name="action_settings">Settings</string>
+    <string name="connecting">Connecting</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connected">Connected</string>
 </resources>
