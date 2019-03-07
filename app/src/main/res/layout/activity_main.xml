@@ -43,7 +43,8 @@
         android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="@dimen/fab_margin">
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone">
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="match_parent"

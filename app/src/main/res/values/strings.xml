@@ -3,5 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="connecting">Connecting</string>
     <string name="disconnected">Disconnected</string>
+    <string name="disconnected_all_caps">DISCONNECTED</string>
     <string name="connected">Connected</string>
+    <string name="ready">READY</string>
+    <string name="choose_account">CHOOSE ACCOUNT</string>
 </resources>
