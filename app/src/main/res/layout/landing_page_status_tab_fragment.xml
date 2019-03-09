@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
-    <include layout="@layout/choose_account"/>
+    <include layout="@layout/choose_account"
+        android:id="@+id/choose_account_layout"/>
+
+    <include layout="@layout/insert_password"
+        android:id="@+id/insert_password_layout"
+        android:visibility="gone"/>
+
+    <include layout="@layout/status_tab_layout_after_sign_in"
+        android:id="@+id/status_tab_layout_after_sign_in"
+        android:visibility="gone"/>
 </RelativeLayout>
