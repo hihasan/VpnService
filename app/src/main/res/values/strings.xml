@@ -18,4 +18,11 @@
     <string name="online_time">ONLINE TIME:</string>
     <string name="pin_content_desc">PIN input field</string>
     <string name="pin_label_text">PIN</string>
+    <string name="server">SERVER</string>
+    <string name="client">CLIENT</string>
+    <string name="username">USERNAME</string>
+    <string name="end_point">END-POINT</string>
+    <string name="ip_address">IP ADDRESS</string>
+    <string name="route">ROUTE</string>
+    <string name="dns">DNS</string>
 </resources>
