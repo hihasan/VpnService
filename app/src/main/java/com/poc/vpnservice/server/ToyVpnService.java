@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 
+import com.poc.vpnservice.activity.MainActivity;
 import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
 import com.poc.vpnservice.util.SLog;
 
@@ -133,7 +134,7 @@ public class ToyVpnService extends VpnService
         }
     }
 
-    public static void startService(LandingPageStatusTabFragment context) {
+    public static void startService(MainActivity context) {
         Intent intent = new Intent(context, ToyVpnService.class);
         context.startService(intent);
     }

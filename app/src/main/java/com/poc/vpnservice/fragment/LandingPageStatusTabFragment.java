@@ -5,11 +5,14 @@ package com.poc.vpnservice.fragment;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.TrafficStats;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.poc.vpnservice.R;
@@ -36,6 +40,7 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 
 public class LandingPageStatusTabFragment extends Fragment implements View.OnFocusChangeListener, View.OnKeyListener, TextWatcher {
+    private TextView RX,TX;
     private View view;
     private AppCompatSpinner accounts_spinner;
     private List<String> accounts_list;
@@ -48,6 +53,12 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private EditText mPinForthDigitEditText;
     private EditText mPinFifthDigitEditText;
     private EditText mPinHiddenEditText;
+
+    //Tx, RX Value
+    private Handler mHandler = new Handler();
+    private long mStartRX = 0;
+    private long mStartTX = 0;
+
     private CharSequence charSequence = new CharSequence() {
         @Override
         public int length() {
@@ -69,8 +80,35 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
+
+        RX = (TextView) view.findViewById(R.id.rx);
+        TX = (TextView) view.findViewById(R.id.tx);
+
+        mStartRX = TrafficStats.getTotalRxBytes();
+        mStartTX = TrafficStats.getTotalTxBytes();
+
+        if (mStartRX == TrafficStats.UNSUPPORTED || mStartTX == TrafficStats.UNSUPPORTED) {
+//            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//            alert.setTitle("Uh Oh!");
+//            alert.setMessage("Your device does not support traffic stat monitoring.");
+//            alert.show();
+        } else {
+            mHandler.postDelayed(mRunnable, 1000);
+        }
+
         return view;
     }
+
+    private final Runnable mRunnable = new Runnable() {
+        public void run() {
+
+            long rxBytes = TrafficStats.getTotalRxBytes() - mStartRX;
+            RX.setText(Long.toString(rxBytes)+" bytes");
+            long txBytes = TrafficStats.getTotalTxBytes() - mStartTX;
+            TX.setText(Long.toString(txBytes)+" bytes");
+            mHandler.postDelayed(mRunnable, 1000);
+        }
+    };
 
     // This event is triggered soon after onCreateView().
     // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
@@ -138,28 +176,28 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 
     private void signInButtonClicked() {
         insertPasswordLayout.setVisibility(View.GONE);
-        switch (view.getId()) {
-            case R.id.fabContainerFrameLayout:
-                Intent intent = VpnService.prepare(MainActivity.this);
-                if (intent != null) {
-                    //启动intent
-                    startActivityForResult(intent, 0);
-                } else {
-                    onActivityResult(0, RESULT_OK, null);
-                }
-        }
+//        switch (view.getId()) {
+//            case R.id.fabContainerFrameLayout:
+//                Intent intent = VpnService.prepare(MainActivity.this);
+//                if (intent != null) {
+//                    //启动intent
+//                    startActivityForResult(intent, 0);
+//                } else {
+//                    onActivityResult(0, RESULT_OK, null);
+//                }
+//        }
         afterSignInLayout.setVisibility(View.VISIBLE);
     }
 
-    protected void onActivityResult(int request, int result, Intent data) {
-        //同意本app启动vpn服务
-        if (result == RESULT_OK) {
-            SLog.e("启动vpnServer", "===============");
-            ToyVpnService.startService(this);
-            return;
-        }
-        SLog.e("不能启动vpnServer", "=============");
-    }
+//    protected void onActivityResult(int request, int result, Intent data) {
+//        //同意本app启动vpn服务
+//        if (result == RESULT_OK) {
+//            SLog.e("启动vpnServer", "===============");
+//            ToyVpnService.startService(this);
+//            return;
+//        }
+//        SLog.e("不能启动vpnServer", "=============");
+//    }
 
     @Override
     public void afterTextChanged(Editable s) {

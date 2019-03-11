@@ -110,15 +110,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    protected void onActivityResult(int request, int result, Intent data) {
-//        //同意本app启动vpn服务
-//        if (result == RESULT_OK) {
-//            SLog.e("启动vpnServer", "===============");
-//            ToyVpnService.startService(this);
-//            return;
-//        }
-//        SLog.e("不能启动vpnServer", "=============");
-//    }
+    protected void onActivityResult(int request, int result, Intent data) {
+        //同意本app启动vpn服务
+        if (result == RESULT_OK) {
+            SLog.e("启动vpnServer", "===============");
+            ToyVpnService.startService(this);
+            return;
+        }
+        SLog.e("不能启动vpnServer", "=============");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
