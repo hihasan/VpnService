@@ -3,7 +3,9 @@ package com.poc.vpnservice.fragment;
 // Created by Arabi on 19-Dec-18.
 
 import android.app.Service;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,9 +26,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.poc.vpnservice.R;
+import com.poc.vpnservice.activity.MainActivity;
+import com.poc.vpnservice.server.ToyVpnService;
+import com.poc.vpnservice.util.SLog;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 public class LandingPageStatusTabFragment extends Fragment implements View.OnFocusChangeListener, View.OnKeyListener, TextWatcher {
     private View view;
@@ -131,7 +138,27 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 
     private void signInButtonClicked() {
         insertPasswordLayout.setVisibility(View.GONE);
+        switch (view.getId()) {
+            case R.id.fabContainerFrameLayout:
+                Intent intent = VpnService.prepare(MainActivity.this);
+                if (intent != null) {
+                    //启动intent
+                    startActivityForResult(intent, 0);
+                } else {
+                    onActivityResult(0, RESULT_OK, null);
+                }
+        }
         afterSignInLayout.setVisibility(View.VISIBLE);
+    }
+
+    protected void onActivityResult(int request, int result, Intent data) {
+        //同意本app启动vpn服务
+        if (result == RESULT_OK) {
+            SLog.e("启动vpnServer", "===============");
+            ToyVpnService.startService(this);
+            return;
+        }
+        SLog.e("不能启动vpnServer", "=============");
     }
 
     @Override

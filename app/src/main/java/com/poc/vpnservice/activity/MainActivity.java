@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.poc.vpnservice.R;
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+//        LinearLayout l =(LinearLayout) findViewById(R.id.clickable);
+//        l.setOnClickListener(this);
 
         viewPager = findViewById(R.id.viewPager);
         adapter = new LandingPageViewPagerAdapter(getSupportFragmentManager());

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 
+import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
 import com.poc.vpnservice.util.SLog;
 
 
@@ -49,7 +50,7 @@ public class ToyVpnService extends VpnService
         builder.setMtu(1500);
 
         //Address, the IP address of this virtual network port;
-        builder.addAddress("178.79.175.120", 24);
+        builder.addAddress("199.58.84.167", 24);
 
 //        In fact, this is not used to modify the routing table on the Android device.
 //          Instead, it is used to change the NAT table of iptables, only matching the IP packets,
@@ -132,7 +133,7 @@ public class ToyVpnService extends VpnService
         }
     }
 
-    public static void startService(Context context) {
+    public static void startService(LandingPageStatusTabFragment context) {
         Intent intent = new Intent(context, ToyVpnService.class);
         context.startService(intent);
     }
