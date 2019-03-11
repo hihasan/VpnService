@@ -80,7 +80,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
-
+	//Code for rx tx
         RX = (TextView) view.findViewById(R.id.rx);
         TX = (TextView) view.findViewById(R.id.tx);
 
@@ -99,6 +99,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         return view;
     }
 
+	//rx tx function
     private final Runnable mRunnable = new Runnable() {
         public void run() {
 
