@@ -27,7 +27,7 @@ import com.poc.vpnservice.adapter.LandingPageViewPagerAdapter;
 import com.poc.vpnservice.server.ToyVpnService;
 import com.poc.vpnservice.util.SLog;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setUpCustomTabs();
 
         fabContainerFrameLayout = findViewById(R.id.fabContainerFrameLayout);
-        fabContainerFrameLayout.setOnClickListener(this);
+        fabContainerFrameLayout.setOnClickListener((View.OnClickListener) this);
     }
 
     //setting custom layout over tab
@@ -96,29 +96,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fabContainerFrameLayout:
-                Intent intent = VpnService.prepare(MainActivity.this);
-                if (intent != null) {
-                    //启动intent
-                    startActivityForResult(intent, 0);
-                } else {
-                    onActivityResult(0, RESULT_OK, null);
-                }
-        }
-    }
+    //Need to set it
 
-    protected void onActivityResult(int request, int result, Intent data) {
-        //同意本app启动vpn服务
-        if (result == RESULT_OK) {
-            SLog.e("启动vpnServer", "===============");
-            ToyVpnService.startService(this);
-            return;
-        }
-        SLog.e("不能启动vpnServer", "=============");
-    }
+//    @Override
+//    public void onClick(View view) {
+//        switch (view.getId()) {
+//            case R.id.fabContainerFrameLayout:
+//                Intent intent = VpnService.prepare(MainActivity.this);
+//                if (intent != null) {
+//                    //启动intent
+//                    startActivityForResult(intent, 0);
+//                } else {
+//                    onActivityResult(0, RESULT_OK, null);
+//                }
+//        }
+//    }
+//
+//    protected void onActivityResult(int request, int result, Intent data) {
+//        //同意本app启动vpn服务
+//        if (result == RESULT_OK) {
+//            SLog.e("启动vpnServer", "===============");
+//            ToyVpnService.startService(this);
+//            return;
+//        }
+//        SLog.e("不能启动vpnServer", "=============");
+//    }
+
+    //End here
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
