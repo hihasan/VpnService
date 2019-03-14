@@ -24,10 +24,11 @@ import android.widget.TextView;
 
 import com.poc.vpnservice.R;
 import com.poc.vpnservice.adapter.LandingPageViewPagerAdapter;
+import com.poc.vpnservice.fragment.LandingPageServiceTabFragment;
 import com.poc.vpnservice.server.ToyVpnService;
 import com.poc.vpnservice.util.SLog;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LandingPageServiceTabFragment.SignOutInterface {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
@@ -46,10 +47,11 @@ public class MainActivity extends AppCompatActivity {
 //        l.setOnClickListener(this);
 
         viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
         viewPager.setOffscreenPageLimit(2);
+
         adapter = new LandingPageViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
-        tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);//setting tab over viewpager
 
         //Implementing tab selected listener over tablayout
@@ -147,5 +149,38 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onSignOut(){
+        adapter = new LandingPageViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);//setting tab over viewpager
 
+        //Implementing tab selected listener over tablayout
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());//setting current selected item over viewpager
+                switch (tab.getPosition()) {
+                    case 0:
+                        Log.e("TAG", "TAB1");
+                        break;
+                    case 1:
+                        Log.e("TAG", "TAB2");
+                        break;
+                    case 2:
+                        Log.e("TAG", "TAB3");
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
+
+        setUpCustomTabs();
+    }
 }

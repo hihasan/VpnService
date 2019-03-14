@@ -59,7 +59,7 @@
                 android:id="@+id/tx"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 bytes"
+                android:text="calculating..."
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_alignParentRight="true"/>
@@ -82,7 +82,7 @@
                 android:id="@+id/rx"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 bytes"
+                android:text="calculating..."
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_alignParentRight="true"/>
@@ -104,7 +104,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 kb/s"
+                android:text="calculating..."
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_alignParentRight="true"/>
@@ -126,7 +126,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 kb/s"
+                android:text="calculating..."
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_alignParentRight="true"/>
