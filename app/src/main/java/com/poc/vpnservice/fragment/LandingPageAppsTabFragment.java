@@ -14,6 +14,20 @@ import com.poc.vpnservice.R;
 public class LandingPageAppsTabFragment extends Fragment {
     private View view;
 
+    private boolean _hasLoadedOnce = false; // your boolean field
+
+    @Override
+    public void setUserVisibleHint(boolean isFragmentVisible_) {
+        super.setUserVisibleHint(true);
+
+        if (this.isVisible()) {
+            // we check that the fragment is becoming visible
+            if (isFragmentVisible_ && !_hasLoadedOnce) {
+                _hasLoadedOnce = true;
+            }
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

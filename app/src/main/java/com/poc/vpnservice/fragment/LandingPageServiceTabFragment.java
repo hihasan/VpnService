@@ -2,17 +2,40 @@ package com.poc.vpnservice.fragment;
 
 // Created by Arabi on 19-Dec-18.
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.poc.vpnservice.R;
 
+import static android.content.Context.MODE_PRIVATE;
+import static com.poc.vpnservice.common.Constants.MY_SHARED_PREFS_NAME;
+import static com.poc.vpnservice.common.Constants.SERVER_END_POINT;
+import static com.poc.vpnservice.common.Constants.USER_ID_SHARED_PREF;
+
 public class LandingPageServiceTabFragment extends Fragment {
     private View view;
+
+    private boolean _hasLoadedOnce = false; // your boolean field
+
+    @Override
+    public void setUserVisibleHint(boolean isFragmentVisible_) {
+        super.setUserVisibleHint(true);
+
+        if (this.isVisible()) {
+            // we check that the fragment is becoming visible
+            if (isFragmentVisible_ && !_hasLoadedOnce) {
+                _hasLoadedOnce = true;
+            }
+        }
+    }
 
     @Nullable
     @Override
@@ -26,7 +49,35 @@ public class LandingPageServiceTabFragment extends Fragment {
     // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        // Setup any handles to view objects here
-        // EditText etFoo = (EditText) view.findViewById(R.id.etFoo);
+        if(_hasLoadedOnce) {
+            // Setup any handles to view objects here
+            TextView userIdTv = view.findViewById(R.id.user_id);
+            SharedPreferences prefs = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE);
+            String userId = prefs.getString(USER_ID_SHARED_PREF, null);
+            if (!TextUtils.isEmpty(userId)) {
+                userIdTv.setText(userId);
+            } else {
+                Toast.makeText(getActivity(), "Error:Invalid User ID!", Toast.LENGTH_SHORT).show();
+            }
+
+            TextView serverEndPoint = view.findViewById(R.id.server_end_point);
+            serverEndPoint.setText(SERVER_END_POINT);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        TextView userIdTv = view.findViewById(R.id.user_id);
+        SharedPreferences prefs = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE);
+        String userId = prefs.getString(USER_ID_SHARED_PREF, null);
+        if (!TextUtils.isEmpty(userId)) {
+            userIdTv.setText(userId);
+        } else {
+            Toast.makeText(getActivity(), "Error:Invalid User ID!", Toast.LENGTH_SHORT).show();
+        }
+
+        TextView serverEndPoint = view.findViewById(R.id.server_end_point);
+        serverEndPoint.setText(SERVER_END_POINT);
     }
 }

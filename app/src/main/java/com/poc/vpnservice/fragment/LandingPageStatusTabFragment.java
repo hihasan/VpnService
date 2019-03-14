@@ -3,7 +3,9 @@ package com.poc.vpnservice.fragment;
 // Created by Arabi on 19-Dec-18.
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.TrafficStats;
 import android.net.VpnService;
@@ -15,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -30,29 +33,40 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.poc.vpnservice.R;
-import com.poc.vpnservice.activity.MainActivity;
 import com.poc.vpnservice.server.ToyVpnService;
 import com.poc.vpnservice.util.SLog;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.poc.vpnservice.common.Constants.LOGIN_STATUS_SHARED_PREF;
+import static com.poc.vpnservice.common.Constants.LOGIN_TIME_IN_MILLIS;
+import static com.poc.vpnservice.common.Constants.MY_SHARED_PREFS_NAME;
+import static com.poc.vpnservice.common.Constants.PIN;
+import static com.poc.vpnservice.common.Constants.PIN_LENGTH;
+import static com.poc.vpnservice.common.Constants.USER_ID;
+import static com.poc.vpnservice.common.Constants.USER_ID_SHARED_PREF;
 
 public class LandingPageStatusTabFragment extends Fragment implements View.OnFocusChangeListener, View.OnKeyListener, TextWatcher {
-    private TextView RX,TX;
+    private TextView RX,TX,onlineTimeTv;
     private View view;
     private AppCompatSpinner accounts_spinner;
     private List<String> accounts_list;
-    private String emailId;
-    private Button readyButton, signInButton;
+    private String userId;
+    private Button readyButton, signInButton, signOutButton;
     private ViewGroup chooseAccountLayout, insertPasswordLayout, afterSignInLayout;
     private EditText mPinFirstDigitEditText;
     private EditText mPinSecondDigitEditText;
     private EditText mPinThirdDigitEditText;
     private EditText mPinForthDigitEditText;
-    private EditText mPinFifthDigitEditText;
     private EditText mPinHiddenEditText;
+    private String inputPin;
+    private long loginTime;
 
     //Tx, RX Value
     private Handler mHandler = new Handler();
@@ -80,9 +94,136 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
-	//Code for rx tx
-        RX = (TextView) view.findViewById(R.id.rx);
-        TX = (TextView) view.findViewById(R.id.tx);
+
+        return view;
+    }
+
+    // This event is triggered soon after onCreateView().
+    // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        Intent intent = VpnService.prepare(getActivity());
+        if (intent != null) {
+            //intent
+            startActivityForResult(intent, 0);
+        } else {
+            onActivityResult(0, RESULT_OK, null);
+        }
+
+        chooseAccountLayout = view.findViewById(R.id.choose_account_layout);
+        insertPasswordLayout = view.findViewById(R.id.insert_password_layout);
+        afterSignInLayout = view.findViewById(R.id.status_tab_layout_after_sign_in);
+
+        accounts_spinner = view.findViewById(R.id.sp_accounts);
+        accounts_list = new ArrayList<>();
+        accounts_list.add("freevpnaccess.com");
+        accounts_list.add("arabi@abc.com");
+        accounts_list.add("nadim@d.com");
+        accounts_list.add("john@xyz.com");
+
+        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, accounts_list);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        accounts_spinner.setAdapter(adapter);
+        accounts_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                userId = accounts_list.get(i);
+                //Toast.makeText(getActivity(), "Selected Account: " + userId, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        readyButton = view.findViewById(R.id.ready_button);
+        readyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(userId.equals(USER_ID)) {
+                    readyButtonClicked();
+                } else {
+                    Toast.makeText(getActivity(), "Error: Incorrect User ID!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        mPinFirstDigitEditText = view.findViewById(R.id.pin_first_edittext);
+        mPinSecondDigitEditText = view.findViewById(R.id.pin_second_edittext);
+        mPinThirdDigitEditText = view.findViewById(R.id.pin_third_edittext);
+        mPinForthDigitEditText = view.findViewById(R.id.pin_forth_edittext);
+        mPinHiddenEditText = view.findViewById(R.id.pin_hidden_edittext);
+        setPINListeners();
+
+        signInButton = view.findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPinFirstDigitEditText.setText("");
+                mPinSecondDigitEditText.setText("");
+                mPinThirdDigitEditText.setText("");
+                mPinForthDigitEditText.setText("");
+                mPinHiddenEditText.setText("");
+
+                if(inputPin.length() == PIN_LENGTH && inputPin.equals(PIN)) {
+                    long loginTimeInMillis = System.currentTimeMillis();
+
+                    SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE).edit();
+                    editor.putBoolean(LOGIN_STATUS_SHARED_PREF, true);
+                    editor.putString(USER_ID_SHARED_PREF, userId);
+                    editor.putLong(LOGIN_TIME_IN_MILLIS, loginTimeInMillis);
+                    editor.apply();
+
+                    signInButtonClicked();
+                } else {
+                    Toast.makeText(getActivity(), "Error: Incorrect pin!", Toast.LENGTH_SHORT).show();
+                    mPinFirstDigitEditText.requestFocus();
+                }
+            }
+        });
+
+        signOutButton = view.findViewById(R.id.sign_out_button);
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOutButtonClicked();
+            }
+        });
+
+        SharedPreferences prefs = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE);
+        boolean loginStatus = prefs.getBoolean(LOGIN_STATUS_SHARED_PREF, false);
+        if(loginStatus) {
+            chooseAccountLayout.setVisibility(GONE);
+            insertPasswordLayout.setVisibility(GONE);
+            afterSignInLayout.setVisibility(VISIBLE);
+            signInButtonClicked();
+        }
+    }
+
+    private void readyButtonClicked() {
+        chooseAccountLayout.setVisibility(GONE);
+        insertPasswordLayout.setVisibility(VISIBLE);
+    }
+
+    @Override
+    public void onActivityResult(int request, int result, Intent data) {
+
+        if (result == RESULT_OK) {
+            SLog.e("vpnServer", "===============");
+            ToyVpnService.startService(getActivity());
+            return;
+        }
+        SLog.e("vpnServer", "=============");
+    }
+
+    private void signInButtonClicked() {
+        //Code for rx tx
+        RX = view.findViewById(R.id.rx);
+        TX = view.findViewById(R.id.tx);
+        onlineTimeTv = view.findViewById(R.id.online_time_value_tv);
+        SharedPreferences prefs = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE);
+        loginTime = prefs.getLong(LOGIN_TIME_IN_MILLIS, 0L);
 
         mStartRX = TrafficStats.getTotalRxBytes();
         mStartTX = TrafficStats.getTotalTxBytes();
@@ -96,10 +237,21 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             mHandler.postDelayed(mRunnable, 1000);
         }
 
-        return view;
+        insertPasswordLayout.setVisibility(GONE);
+        afterSignInLayout.setVisibility(VISIBLE);
     }
 
-	//rx tx function
+    private void signOutButtonClicked() {
+        SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putBoolean(LOGIN_STATUS_SHARED_PREF, false);
+        editor.putString(USER_ID_SHARED_PREF, null);
+        editor.apply();
+
+        afterSignInLayout.setVisibility(GONE);
+        chooseAccountLayout.setVisibility(VISIBLE);
+    }
+
+    //rx tx function
     private final Runnable mRunnable = new Runnable() {
         public void run() {
 
@@ -107,98 +259,27 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             RX.setText(Long.toString(rxBytes)+" bytes");
             long txBytes = TrafficStats.getTotalTxBytes() - mStartTX;
             TX.setText(Long.toString(txBytes)+" bytes");
+
+            long currentTime = System.currentTimeMillis();
+            long difference = currentTime - loginTime;
+            String onlineTime = "";
+            int hours = (int) difference/(60*60*1000);
+            if (hours > 0) {
+                onlineTime = onlineTime + hours + "hr ";
+            }
+            int minutes = (int) (difference%(60*60*1000))/(60*1000);
+            if (minutes > 0) {
+                onlineTime = onlineTime + minutes + "min ";
+            }
+            int seconds = (int) ((difference%(60*60*1000))%(60*1000))/1000;
+            if (seconds > 0) {
+                onlineTime = onlineTime + seconds + "sec";
+            }
+            onlineTimeTv.setText(onlineTime);
+
             mHandler.postDelayed(mRunnable, 1000);
         }
     };
-
-    // This event is triggered soon after onCreateView().
-    // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        chooseAccountLayout = view.findViewById(R.id.choose_account_layout);
-        insertPasswordLayout = view.findViewById(R.id.insert_password_layout);
-        afterSignInLayout = view.findViewById(R.id.status_tab_layout_after_sign_in);
-
-        accounts_spinner = view.findViewById(R.id.sp_accounts);
-        accounts_list = new ArrayList<>();
-        accounts_list.add("arabi@abc.com");
-        accounts_list.add("nadim@d.com");
-        accounts_list.add("john@xyz.com");
-
-        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, accounts_list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        accounts_spinner.setAdapter(adapter);
-        accounts_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                emailId = accounts_list.get(i);
-                //Toast.makeText(getActivity(), "Selected Account: " + emailId, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        readyButton = view.findViewById(R.id.ready_button);
-        readyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                readyButtonClicked();
-            }
-        });
-
-        mPinFirstDigitEditText = view.findViewById(R.id.pin_first_edittext);
-        mPinSecondDigitEditText = view.findViewById(R.id.pin_second_edittext);
-        mPinThirdDigitEditText = view.findViewById(R.id.pin_third_edittext);
-        mPinForthDigitEditText = view.findViewById(R.id.pin_forth_edittext);
-        mPinFifthDigitEditText = view.findViewById(R.id.pin_fifth_edittext);
-        mPinHiddenEditText = view.findViewById(R.id.pin_hidden_edittext);
-        setPINListeners();
-
-        signInButton = view.findViewById(R.id.sign_in_button);
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(charSequence.length() == 5) {
-                    signInButtonClicked();
-                } else {
-                    Toast.makeText(getActivity(), "Error: Incorrect pin length", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    private void readyButtonClicked() {
-        chooseAccountLayout.setVisibility(View.GONE);
-        insertPasswordLayout.setVisibility(View.VISIBLE);
-    }
-
-    private void signInButtonClicked() {
-        insertPasswordLayout.setVisibility(View.GONE);
-//        switch (view.getId()) {
-//            case R.id.fabContainerFrameLayout:
-//                Intent intent = VpnService.prepare(MainActivity.this);
-//                if (intent != null) {
-//                    //启动intent
-//                    startActivityForResult(intent, 0);
-//                } else {
-//                    onActivityResult(0, RESULT_OK, null);
-//                }
-//        }
-        afterSignInLayout.setVisibility(View.VISIBLE);
-    }
-
-//    protected void onActivityResult(int request, int result, Intent data) {
-//        //同意本app启动vpn服务
-//        if (result == RESULT_OK) {
-//            SLog.e("启动vpnServer", "===============");
-//            ToyVpnService.startService(this);
-//            return;
-//        }
-//        SLog.e("不能启动vpnServer", "=============");
-//    }
 
     @Override
     public void afterTextChanged(Editable s) {
@@ -275,12 +356,6 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
                 }
                 break;
 
-            case R.id.pin_fifth_edittext:
-                if (hasFocus) {
-                    setFocus(mPinHiddenEditText);
-                    showSoftKeyboard(mPinHiddenEditText);
-                }
-                break;
             default:
                 break;
         }
@@ -293,9 +368,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             switch (id) {
                 case R.id.pin_hidden_edittext:
                     if (keyCode == KeyEvent.KEYCODE_DEL) {
-                        if (mPinHiddenEditText.getText().length() == 5)
-                            mPinFifthDigitEditText.setText("");
-                        else if (mPinHiddenEditText.getText().length() == 4)
+                        if (mPinHiddenEditText.getText().length() == 4)
                             mPinForthDigitEditText.setText("");
                         else if (mPinHiddenEditText.getText().length() == 3)
                             mPinThirdDigitEditText.setText("");
@@ -339,27 +412,21 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             mPinSecondDigitEditText.setText("");
             mPinThirdDigitEditText.setText("");
             mPinForthDigitEditText.setText("");
-            mPinFifthDigitEditText.setText("");
         } else if (s.length() == 2) {
             //setFocusedPinBackground(mPinThirdDigitEditText);
             mPinSecondDigitEditText.setText(s.charAt(1) + "");
             mPinThirdDigitEditText.setText("");
             mPinForthDigitEditText.setText("");
-            mPinFifthDigitEditText.setText("");
         } else if (s.length() == 3) {
             //setFocusedPinBackground(mPinForthDigitEditText);
             mPinThirdDigitEditText.setText(s.charAt(2) + "");
             mPinForthDigitEditText.setText("");
-            mPinFifthDigitEditText.setText("");
         } else if (s.length() == 4) {
             //setFocusedPinBackground(mPinFifthDigitEditText);
             mPinForthDigitEditText.setText(s.charAt(3) + "");
-            mPinFifthDigitEditText.setText("");
-        } else if (s.length() == 5) {
-            //setDefaultPinBackground(mPinFifthDigitEditText);
-            mPinFifthDigitEditText.setText(s.charAt(4) + "");
 
-            hideSoftKeyboard(mPinFifthDigitEditText);
+            inputPin = mPinFirstDigitEditText.getText().toString() + mPinSecondDigitEditText.getText().toString() + mPinThirdDigitEditText.getText().toString() + mPinForthDigitEditText.getText().toString();
+            hideSoftKeyboard(mPinForthDigitEditText);
         }
     }
 
@@ -411,13 +478,11 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         mPinSecondDigitEditText.setOnFocusChangeListener(this);
         mPinThirdDigitEditText.setOnFocusChangeListener(this);
         mPinForthDigitEditText.setOnFocusChangeListener(this);
-        mPinFifthDigitEditText.setOnFocusChangeListener(this);
 
         mPinFirstDigitEditText.setOnKeyListener(this);
         mPinSecondDigitEditText.setOnKeyListener(this);
         mPinThirdDigitEditText.setOnKeyListener(this);
         mPinForthDigitEditText.setOnKeyListener(this);
-        mPinFifthDigitEditText.setOnKeyListener(this);
         mPinHiddenEditText.setOnKeyListener(this);
     }
 

@@ -146,9 +146,10 @@
                 android:layout_alignParentLeft="true"/>
 
             <TextView
+                android:id="@+id/online_time_value_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3 min 6 sec"
+                android:text="0sec"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_alignParentRight="true"/>
@@ -163,7 +164,7 @@
         android:padding="20dp">
 
         <Button
-            android:id="@+id/ready_button"
+            android:id="@+id/sign_out_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sign_out"

@@ -24,6 +24,8 @@ public class ToyVpnService extends VpnService
 
     private static final String TAG = "ToyVpnService";
 
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SLog.e(TAG, "Start service");
@@ -51,7 +53,7 @@ public class ToyVpnService extends VpnService
         builder.setMtu(1500);
 
         //Address, the IP address of this virtual network port;
-        builder.addAddress("199.58.84.167", 24);
+        builder.addAddress("69.60.121.29", 24);
 
 //        In fact, this is not used to modify the routing table on the Android device.
 //          Instead, it is used to change the NAT table of iptables, only matching the IP packets,
@@ -134,7 +136,7 @@ public class ToyVpnService extends VpnService
         }
     }
 
-    public static void startService(MainActivity context) {
+    public static void startService(Context context) {
         Intent intent = new Intent(context, ToyVpnService.class);
         context.startService(intent);
     }

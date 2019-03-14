@@ -42,9 +42,10 @@
                     android:layout_alignParentLeft="true"/>
 
                 <TextView
+                    android:id="@+id/user_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="arabi@gmail.com"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:layout_alignParentRight="true"/>
@@ -64,9 +65,10 @@
                     android:layout_alignParentLeft="true"/>
 
                 <TextView
+                    android:id="@+id/server_end_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="87.94.113.6:5000"
+                    android:text="69.60.121.29"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:layout_alignParentRight="true"/>
@@ -167,7 +169,7 @@
         android:padding="20dp">
 
         <Button
-            android:id="@+id/ready_button"
+            android:id="@+id/sign_out_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sign_out"

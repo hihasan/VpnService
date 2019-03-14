@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 //        l.setOnClickListener(this);
 
         viewPager = findViewById(R.id.viewPager);
+        viewPager.setOffscreenPageLimit(2);
         adapter = new LandingPageViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         tabLayout = findViewById(R.id.tabLayout);
@@ -80,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         setUpCustomTabs();
 
-        fabContainerFrameLayout = findViewById(R.id.fabContainerFrameLayout);
-        fabContainerFrameLayout.setOnClickListener((View.OnClickListener) this);
+//        fabContainerFrameLayout = findViewById(R.id.fabContainerFrameLayout);
+//        fabContainerFrameLayout.setOnClickListener((View.OnClickListener) this);
     }
 
     //setting custom layout over tab
@@ -98,13 +99,13 @@ public class MainActivity extends AppCompatActivity {
 
     //Need to set it
 
-//    @Override
+
 //    public void onClick(View view) {
 //        switch (view.getId()) {
 //            case R.id.fabContainerFrameLayout:
 //                Intent intent = VpnService.prepare(MainActivity.this);
 //                if (intent != null) {
-//                    //启动intent
+//                    //intent
 //                    startActivityForResult(intent, 0);
 //                } else {
 //                    onActivityResult(0, RESULT_OK, null);
@@ -113,13 +114,13 @@ public class MainActivity extends AppCompatActivity {
 //    }
 //
 //    protected void onActivityResult(int request, int result, Intent data) {
-//        //同意本app启动vpn服务
+//
 //        if (result == RESULT_OK) {
-//            SLog.e("启动vpnServer", "===============");
+//            SLog.e("vpnServer", "===============");
 //            ToyVpnService.startService(this);
 //            return;
 //        }
-//        SLog.e("不能启动vpnServer", "=============");
+//        SLog.e("vpnServer", "=============");
 //    }
 
     //End here
