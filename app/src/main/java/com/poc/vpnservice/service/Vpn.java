@@ -9,6 +9,8 @@ import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.poc.vpnservice.R;
+import com.poc.vpnservice.activity.MainActivity;
 import com.poc.vpnservice.server.ByteBufferPool;
 import com.poc.vpnservice.server.Packet;
 
