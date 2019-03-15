@@ -200,16 +200,16 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         insertPasswordLayout.setVisibility(VISIBLE);
     }
 
-    @Override
-    public void onActivityResult(int request, int result, Intent data) {
-
-        if (result == RESULT_OK) {
-            SLog.e("vpnServer", "===============");
-            ToyVpnService.startService(getActivity());
-            return;
-        }
-        SLog.e("vpnServer", "=============");
-    }
+//    @Override
+//    public void onActivityResult(int request, int result, Intent data) {
+//
+//        if (result == RESULT_OK) {
+//            SLog.e("vpnServer", "===============");
+//            ToyVpnService.startService(getActivity());
+//            return;
+//        }
+//        SLog.e("vpnServer", "=============");
+//    }
 
     private void signInButtonClicked() {
         //Code for rx tx
