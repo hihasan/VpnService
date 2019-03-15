@@ -3,7 +3,6 @@ package com.poc.vpnservice.fragment;
 // Created by Arabi on 19-Dec-18.
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -14,12 +13,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,11 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.poc.vpnservice.R;
-import com.poc.vpnservice.server.ToyVpnService;
 import com.poc.vpnservice.util.SLog;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
