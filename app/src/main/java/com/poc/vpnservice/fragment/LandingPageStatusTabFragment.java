@@ -104,7 +104,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
-        getActivity().registerReceiver(vpnStateReceiver, new IntentFilter(Vpn.BROADCAST_VPN_STATE));
+
 
         return view;
     }
@@ -217,11 +217,11 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private void readyButtonClicked() {
         chooseAccountLayout.setVisibility(GONE);
         //Ekhane Action Hobe
-        if(!isStart) {
-            startVPN();
-        }else{
-            getActivity().sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
-        }
+//        if(!isStart) {
+//            startVPN();
+//        }else{
+//            getActivity().sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
+//        }
         insertPasswordLayout.setVisibility(VISIBLE);
     }
 
@@ -233,67 +233,67 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         }
     });
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
+//    private Runnable runnable = new Runnable() {
+//        @Override
+//        public void run() {
+//
+//            getActivity().stopService(new Intent(getActivity(), Vpn.class));
+//        }
+//    };
 
-            getActivity().stopService(new Intent(getActivity(), Vpn.class));
-        }
-    };
 
+//    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
+//    {
+//        @Override
+//        public void onReceive(Context context, Intent intent)
+//        {
+//            if (Vpn.BROADCAST_VPN_STATE.equals(intent.getAction()))
+//            {
+//                if (intent.getBooleanExtra("running", false))
+//                {
+//                    isStart = true;
+//
+//                }
+//                else
+//                {
+//                    isStart =false;
+//
+//                    handler.postDelayed(runnable,200);
+//                }
+//            }
+//        }
+//    };
 
-    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
-    {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if (Vpn.BROADCAST_VPN_STATE.equals(intent.getAction()))
-            {
-                if (intent.getBooleanExtra("running", false))
-                {
-                    isStart = true;
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data)
+//    {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
+//        {
+//            getActivity().startService(new Intent(getActivity(), Vpn.class));
+//        }
+//    }
 
-                }
-                else
-                {
-                    isStart =false;
-
-                    handler.postDelayed(runnable,200);
-                }
-            }
-        }
-    };
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
-        {
-            getActivity().startService(new Intent(getActivity(), Vpn.class));
-        }
-    }
-
-    private void startVPN()
-    {
-        Intent vpnIntent = VpnService.prepare(getActivity());
-        if (vpnIntent != null)
-        {
-            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
-        }
-        else
-        {
-            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
-        }
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        handler.removeCallbacks(runnable);
-        getActivity().unregisterReceiver(vpnStateReceiver);
-    }
+//    private void startVPN()
+//    {
+//        Intent vpnIntent = VpnService.prepare(getActivity());
+//        if (vpnIntent != null)
+//        {
+//            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
+//        }
+//        else
+//        {
+//            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+//        }
+//    }
+//
+//    @Override
+//    public void onDestroy()
+//    {
+//        super.onDestroy();
+//        handler.removeCallbacks(runnable);
+//        getActivity().unregisterReceiver(vpnStateReceiver);
+//    }
 
 //    @Override
 //    public void onActivityResult(int request, int result, Intent data) {
