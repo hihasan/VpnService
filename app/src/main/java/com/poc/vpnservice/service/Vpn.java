@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 public class Vpn extends VpnService
 {
 
-    private static final String TAG = "DemoService";
+    private static final String TAG = "Vpn";
     public static final String VPN_ADDRESS = "69.60.121.29";
     private static final String VPN_ROUTE = "0.0.0.0";
     //private static final String VPN_DNS = "192.168.1.1";
@@ -65,8 +65,8 @@ public class Vpn extends VpnService
                 builder.addRoute(VPN_ROUTE, 0);
 
                 //Need to work on it
-                Intent configure = new Intent(this, MainActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(this, 0, configure, PendingIntent.FLAG_UPDATE_CURRENT);
+                Intent configure = new Intent(getApplicationContext(), MainActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, configure, PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.setConfigureIntent(pi);
 
                 vpnInterface = builder.setSession(getString(R.string.app_name)).establish();

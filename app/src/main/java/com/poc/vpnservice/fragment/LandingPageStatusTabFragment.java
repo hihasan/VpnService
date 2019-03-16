@@ -96,7 +96,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
-        registerReceiver(vpnStateReceiver, new IntentFilter(Vpn.BROADCAST_VPN_STATE));
+        getActivity().registerReceiver(vpnStateReceiver, new IntentFilter(Vpn.BROADCAST_VPN_STATE));
         return view;
     }
 
@@ -209,7 +209,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         if(!isStart) {
             startVPN();
         }else{
-            sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
+            getActivity().sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
         }
         insertPasswordLayout.setVisibility(VISIBLE);
     }
@@ -226,7 +226,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         @Override
         public void run() {
 
-            stopService(new Intent(getActivity(), Vpn.class));
+            getActivity().stopService(new Intent(getActivity(), Vpn.class));
         }
     };
 
@@ -259,13 +259,13 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
         {
-            startService(new Intent(this, Vpn.class));
+            getActivity().startService(new Intent(getActivity(), Vpn.class));
         }
     }
 
     private void startVPN()
     {
-        Intent vpnIntent = VpnService.prepare(this);
+        Intent vpnIntent = VpnService.prepare(getActivity());
         if (vpnIntent != null)
         {
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
@@ -281,7 +281,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     {
         super.onDestroy();
         handler.removeCallbacks(runnable);
-        unregisterReceiver(vpnStateReceiver);
+        getActivity().unregisterReceiver(vpnStateReceiver);
     }
 
 //    @Override
