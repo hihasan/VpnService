@@ -67,6 +67,9 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private String inputPin;
     private long loginTime;
 
+    private boolean isStart;
+    private static final int VPN_REQUEST_CODE = 0x0F;
+
     //Tx, RX Value
     private Handler mHandler = new Handler();
     private long mStartRX = 0;
@@ -202,6 +205,12 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 
     private void readyButtonClicked() {
         chooseAccountLayout.setVisibility(GONE);
+        //Ekhane Action Hobe
+        if(!isStart) {
+            startVPN();
+        }else{
+            sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
+        }
         insertPasswordLayout.setVisibility(VISIBLE);
     }
 
@@ -227,17 +236,17 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            if (DemoService.BROADCAST_VPN_STATE.equals(intent.getAction()))
+            if (Vpn.BROADCAST_VPN_STATE.equals(intent.getAction()))
             {
                 if (intent.getBooleanExtra("running", false))
                 {
                     isStart = true;
-                    btnStart.setText("stop");
+
                 }
                 else
                 {
                     isStart =false;
-                    btnStart.setText("start");
+
                     handler.postDelayed(runnable,200);
                 }
             }
@@ -250,7 +259,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
         {
-            startService(new Intent(this, DemoService.class));
+            startService(new Intent(this, Vpn.class));
         }
     }
 
@@ -268,7 +277,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     }
 
     @Override
-    protected void onDestroy()
+    public void onDestroy()
     {
         super.onDestroy();
         handler.removeCallbacks(runnable);
