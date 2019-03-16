@@ -3,7 +3,10 @@ package com.poc.vpnservice.fragment;
 // Created by Arabi on 19-Dec-18.
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.TrafficStats;
@@ -11,6 +14,7 @@ import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
@@ -29,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.poc.vpnservice.R;
+import com.poc.vpnservice.service.Vpn;
 import com.poc.vpnservice.util.SLog;
 
 import java.util.ArrayList;
@@ -88,7 +93,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
-
+        registerReceiver(vpnStateReceiver, new IntentFilter(Vpn.BROADCAST_VPN_STATE));
         return view;
     }
 
@@ -198,6 +203,76 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private void readyButtonClicked() {
         chooseAccountLayout.setVisibility(GONE);
         insertPasswordLayout.setVisibility(VISIBLE);
+    }
+
+    //Hasan Code
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            return false;
+        }
+    });
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+
+            stopService(new Intent(getActivity(), Vpn.class));
+        }
+    };
+
+
+    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if (DemoService.BROADCAST_VPN_STATE.equals(intent.getAction()))
+            {
+                if (intent.getBooleanExtra("running", false))
+                {
+                    isStart = true;
+                    btnStart.setText("stop");
+                }
+                else
+                {
+                    isStart =false;
+                    btnStart.setText("start");
+                    handler.postDelayed(runnable,200);
+                }
+            }
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
+        {
+            startService(new Intent(this, DemoService.class));
+        }
+    }
+
+    private void startVPN()
+    {
+        Intent vpnIntent = VpnService.prepare(this);
+        if (vpnIntent != null)
+        {
+            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
+        }
+        else
+        {
+            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+        }
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        handler.removeCallbacks(runnable);
+        unregisterReceiver(vpnStateReceiver);
     }
 
 //    @Override
