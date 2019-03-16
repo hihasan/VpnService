@@ -20,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,10 +37,17 @@ import com.poc.vpnservice.R;
 import com.poc.vpnservice.service.Vpn;
 import com.poc.vpnservice.util.SLog;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -97,8 +105,11 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.landing_page_status_tab_fragment, container, false);
         getActivity().registerReceiver(vpnStateReceiver, new IntentFilter(Vpn.BROADCAST_VPN_STATE));
+
         return view;
     }
+
+
 
     // This event is triggered soon after onCreateView().
     // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
@@ -582,4 +593,6 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             view.setBackgroundDrawable(background);
         }
     }
+
+
 }
