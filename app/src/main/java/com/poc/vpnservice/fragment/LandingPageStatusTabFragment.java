@@ -75,8 +75,8 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private String inputPin;
     private long loginTime;
 
-    private boolean isStart;
-    private static final int VPN_REQUEST_CODE = 0x0F;
+//    private boolean isStart;
+//    private static final int VPN_REQUEST_CODE = 0x0F;
 
     //Tx, RX Value
     private Handler mHandler = new Handler();
@@ -217,22 +217,18 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private void readyButtonClicked() {
         chooseAccountLayout.setVisibility(GONE);
         //Ekhane Action Hobe
-//        if(!isStart) {
-//            startVPN();
-//        }else{
-//            getActivity().sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
-//        }
+
         insertPasswordLayout.setVisibility(VISIBLE);
     }
 
     //Hasan Code
-    private Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            return false;
-        }
-    });
-
+//    private Handler handler = new Handler(new Handler.Callback() {
+//        @Override
+//        public boolean handleMessage(Message msg) {
+//            return false;
+//        }
+//    });
+//
 //    private Runnable runnable = new Runnable() {
 //        @Override
 //        public void run() {
@@ -240,8 +236,8 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 //            getActivity().stopService(new Intent(getActivity(), Vpn.class));
 //        }
 //    };
-
-
+//
+//
 //    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
 //    {
 //        @Override
@@ -263,7 +259,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 //            }
 //        }
 //    };
-
+//
 //    @Override
 //    public void onActivityResult(int requestCode, int resultCode, Intent data)
 //    {
@@ -273,7 +269,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 //            getActivity().startService(new Intent(getActivity(), Vpn.class));
 //        }
 //    }
-
+//
 //    private void startVPN()
 //    {
 //        Intent vpnIntent = VpnService.prepare(getActivity());
@@ -307,6 +303,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
 //    }
 
     private void signInButtonClicked() {
+
         //Code for rx tx
         RX = view.findViewById(R.id.rx);
         TX = view.findViewById(R.id.tx);

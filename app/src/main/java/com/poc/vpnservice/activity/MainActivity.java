@@ -1,6 +1,12 @@
 package com.poc.vpnservice.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.net.VpnService;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +21,7 @@ import android.widget.TextView;
 import com.poc.vpnservice.R;
 import com.poc.vpnservice.adapter.LandingPageViewPagerAdapter;
 import com.poc.vpnservice.fragment.LandingPageServiceTabFragment;
+import com.poc.vpnservice.service.Vpn;
 
 public class MainActivity extends AppCompatActivity implements LandingPageServiceTabFragment.SignOutInterface {
 
@@ -23,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
     private LandingPageViewPagerAdapter adapter;
     private FrameLayout fabContainerFrameLayout;
     private static final String[] tabArray = {"STATUS", "SERVICE", "APPS"};//Tab title array
+    private boolean isStart;
+    private static final int VPN_REQUEST_CODE = 0x0F;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +39,16 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+
+        if(!isStart) {
+            //StartService(new Intent(MainActivity.this, Vpn.class));
+            startVPN();
+        }
+        else{
+            sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
+        }
 
 //        LinearLayout l =(LinearLayout) findViewById(R.id.clickable);
 //        l.setOnClickListener(this);
@@ -73,6 +92,67 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
 
 //        fabContainerFrameLayout = findViewById(R.id.fabContainerFrameLayout);
 //        fabContainerFrameLayout.setOnClickListener((View.OnClickListener) this);
+    }
+
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            return false;
+        }
+    });
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+
+            stopService(new Intent(MainActivity.this, Vpn.class));
+        }
+    };
+
+
+    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if (Vpn.BROADCAST_VPN_STATE.equals(intent.getAction()))
+            {
+                if (intent.getBooleanExtra("running", false))
+                {
+                    isStart = true;
+
+                }
+                else
+                {
+                    isStart =false;
+
+                    handler.postDelayed(runnable,200);
+                }
+            }
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
+        {
+            startService(new Intent(MainActivity.this, Vpn.class));
+        }
+    }
+
+    private void startVPN()
+    {
+        Intent vpnIntent = VpnService.prepare(MainActivity.this);
+        if (vpnIntent != null)
+        {
+            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
+        }
+        else
+        {
+            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+        }
     }
 
     //setting custom layout over tab
@@ -170,5 +250,13 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
         });
 
         setUpCustomTabs();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        handler.removeCallbacks(runnable);
+        unregisterReceiver(vpnStateReceiver);
     }
 }

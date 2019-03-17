@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.poc.vpnservice.R;
 import com.poc.vpnservice.activity.MainActivity;
+import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
 import com.poc.vpnservice.server.ByteBufferPool;
 import com.poc.vpnservice.server.Packet;
 
@@ -65,7 +66,7 @@ public class Vpn extends VpnService
                 builder.addRoute(VPN_ROUTE, 0);
 
                 //Need to work on it
-                Intent configure = new Intent(getApplicationContext(), MainActivity.class);
+                Intent configure = new Intent(this, MainActivity.class);
                 PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, configure, PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.setConfigureIntent(pi);
 
