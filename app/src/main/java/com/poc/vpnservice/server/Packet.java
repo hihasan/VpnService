@@ -10,7 +10,9 @@ import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.NullCipher;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class Packet
 {
@@ -28,6 +30,7 @@ public class Packet
     private boolean isPing;
     private boolean bForbin=false;
     private static final String TAG = "Packet";
+    private int payloadSize;
 
     public Packet(ByteBuffer buffer, boolean bForbin) throws UnknownHostException {
         this.ip4Header = new IP4Header(buffer);
@@ -84,11 +87,28 @@ public class Packet
         return isPing;
     }
 
+    public static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+        byte[] encrypted = cipher.doFinal(clear);
+        return encrypted;
+    }
+
+    public static byte[] decrypt(byte[] raw, byte[] encrypted) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+        byte[] decrypted = cipher.doFinal(encrypted);
+        return decrypted;
+    }
+
     public void swapSourceAndDestination() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        Cipher ecipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        byte[] iv = new byte[256];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(iv);
+
+//        Cipher ecipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//        byte[] iv = new byte[256];
+//        SecureRandom random = new SecureRandom();
+//        random.nextBytes(iv);
 
 
         InetAddress newSourceAddress = ip4Header.destinationAddress;
@@ -106,11 +126,13 @@ public class Packet
             int newSourcePort = tcpHeader.destinationPort;
             tcpHeader.destinationPort = tcpHeader.sourcePort;
             tcpHeader.sourcePort = newSourcePort;
+//            ecipher.getIV();
         }
     }
 
     public void updateTCPBuffer(ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize)
     {
+        this.payloadSize = payloadSize;
         //buffer.position(0);
         buffer.clear();
         try

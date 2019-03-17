@@ -11,18 +11,30 @@ import android.util.Log;
 
 import com.poc.vpnservice.R;
 import com.poc.vpnservice.activity.MainActivity;
-import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
+//import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
 import com.poc.vpnservice.server.ByteBufferPool;
 import com.poc.vpnservice.server.Packet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static com.poc.vpnservice.server.Packet.decrypt;
+import static com.poc.vpnservice.server.Packet.encrypt;
 
 public class Vpn extends VpnService
 {
@@ -155,12 +167,51 @@ public class Vpn extends VpnService
             FileChannel vpnInput = new FileInputStream(vpnInterface.getFileDescriptor()).getChannel();
             FileChannel vpnOutput = new FileOutputStream(vpnInterface.getFileDescriptor()).getChannel();
 
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] b = baos.toByteArray();
+
+            byte[] keyStart = "this is a key".getBytes();
+            KeyGenerator kgen = null;
+            try {
+                kgen = KeyGenerator.getInstance("AES");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+            SecureRandom sr = null;
+            try {
+                sr = SecureRandom.getInstance("SHA1PRNG");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+            sr.setSeed(keyStart);
+            kgen.init(128, sr); // 192 and 256 bits may not be available
+            SecretKey skey = kgen.generateKey();
+            byte[] key = skey.getEncoded();
+
+// encrypt
+            byte[] encryptedData = new byte[0];
+            try {
+                encryptedData = (Packet.encrypt(key,b));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+// decrypt
+
+            try {
+                byte[] decryptedData = decrypt(key,encryptedData);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             ByteBuffer bufferToNetwork = null;
             while (true)
             {
                 if(isStop)
                 {
                     vpnInterface = null;
+
+                    //AES
+
                     break;
                 }
 
@@ -187,7 +238,7 @@ public class Vpn extends VpnService
                     Packet packet = null;
                     try
                     {
-                        packet = new Packet(bufferToNetwork, false);
+                        packet = new Packet(bufferToNetwork, true);
                     }
                     catch (UnknownHostException e)
                     {
@@ -195,10 +246,12 @@ public class Vpn extends VpnService
                         e.printStackTrace();
                     }
 
+                    //
                     String sIp = null;
                     if(packet.ip4Header.destinationAddress !=null)
                     {
                         sIp = packet.ip4Header.destinationAddress.getHostAddress();
+
                     }
 
 
@@ -235,5 +288,7 @@ public class Vpn extends VpnService
             }
 
         }
+
+
     }
 }
