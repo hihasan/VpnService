@@ -5,6 +5,12 @@ import android.util.Log;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 
 public class Packet
 {
@@ -78,8 +84,13 @@ public class Packet
         return isPing;
     }
 
-    public void swapSourceAndDestination()
-    {
+    public void swapSourceAndDestination() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        Cipher ecipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        byte[] iv = new byte[256];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+
+
         InetAddress newSourceAddress = ip4Header.destinationAddress;
         ip4Header.destinationAddress = ip4Header.sourceAddress;
         ip4Header.sourceAddress = newSourceAddress;
