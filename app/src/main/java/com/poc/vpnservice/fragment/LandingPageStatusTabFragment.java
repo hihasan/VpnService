@@ -60,7 +60,7 @@ import static com.poc.vpnservice.common.Constants.USER_ID;
 import static com.poc.vpnservice.common.Constants.USER_ID_SHARED_PREF;
 
 public class LandingPageStatusTabFragment extends Fragment implements View.OnFocusChangeListener, View.OnKeyListener, TextWatcher {
-    private TextView RX,TX,onlineTimeTv;
+    private TextView RX,TX,onlineTimeTv,uplink, downlink;
     private View view;
     private AppCompatSpinner accounts_spinner;
     private List<String> accounts_list;
@@ -310,6 +310,8 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         //Code for rx tx
         RX = view.findViewById(R.id.rx);
         TX = view.findViewById(R.id.tx);
+        uplink=view.findViewById(R.id.uplink);
+        downlink=view.findViewById(R.id.downlink);
         onlineTimeTv = view.findViewById(R.id.online_time_value_tv);
         SharedPreferences prefs = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE);
         loginTime = prefs.getLong(LOGIN_TIME_IN_MILLIS, 0L);
@@ -348,6 +350,10 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             RX.setText(Long.toString(rxBytes)+" bytes");
             long txBytes = TrafficStats.getTotalTxBytes() - mStartTX;
             TX.setText(Long.toString(txBytes)+" bytes");
+            double uplinkBytes=((TrafficStats.getTotalRxBytes() - mStartRX)/1024);
+            uplink.setText(String.valueOf(uplinkBytes)+" Kbps");
+            double downlinkBytes=((TrafficStats.getTotalRxBytes() - mStartRX)/3072);
+            downlink.setText(String.valueOf(downlinkBytes)+" Kbps");
 
             long currentTime = System.currentTimeMillis();
             long difference = currentTime - loginTime;
