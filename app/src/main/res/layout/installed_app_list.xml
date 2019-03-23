@@ -31,10 +31,14 @@
         android:id="@+id/wifi"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_toRightOf="@id/list_app_name"
-        android:src="@drawable/wifi"
-        android:layout_alignParentRight="true"
+        android:layout_alignWithParentIfMissing="false"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="2dp"/>
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:layout_marginTop="2dp"
+        android:layout_toRightOf="@id/list_app_name"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:src="@drawable/wifi" />
 
 </RelativeLayout>
