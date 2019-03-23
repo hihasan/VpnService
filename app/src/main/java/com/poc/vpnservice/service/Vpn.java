@@ -40,7 +40,7 @@ public class Vpn extends VpnService
 {
 
     private static final String TAG = "Vpn";
-    public static final String VPN_ADDRESS = "69.60.121.29";
+    public static final String VPN_ADDRESS = "213.229.89.2";
     private static final String VPN_ROUTE = "0.0.0.0";
     //private static final String VPN_DNS = "192.168.1.1";
 
