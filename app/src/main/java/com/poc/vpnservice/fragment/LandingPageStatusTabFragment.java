@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.poc.vpnservice.R;
+import com.poc.vpnservice.activity.MainActivity;
 import com.poc.vpnservice.service.Vpn;
 import com.poc.vpnservice.util.SLog;
 
@@ -54,7 +55,6 @@ import static android.view.View.VISIBLE;
 import static com.poc.vpnservice.common.Constants.LOGIN_STATUS_SHARED_PREF;
 import static com.poc.vpnservice.common.Constants.LOGIN_TIME_IN_MILLIS;
 import static com.poc.vpnservice.common.Constants.MY_SHARED_PREFS_NAME;
-import static com.poc.vpnservice.common.Constants.PIN;
 import static com.poc.vpnservice.common.Constants.PIN_LENGTH;
 import static com.poc.vpnservice.common.Constants.USER_ID;
 import static com.poc.vpnservice.common.Constants.USER_ID_SHARED_PREF;
@@ -64,7 +64,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private View view;
     private AppCompatSpinner accounts_spinner;
     private List<String> accounts_list;
-    private String userId;
+    private String userId, userPin;
     private Button readyButton, signInButton, signOutButton;
     private ViewGroup chooseAccountLayout, insertPasswordLayout, afterSignInLayout;
     private EditText mPinFirstDigitEditText;
@@ -72,8 +72,12 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     private EditText mPinThirdDigitEditText;
     private EditText mPinForthDigitEditText;
     private EditText mPinHiddenEditText;
+    private TextView accountNameTv;
     private String inputPin;
     private long loginTime;
+    private boolean isStart;
+    private static final int VPN_REQUEST_CODE = 0x0F;
+    private List<String> pinList;
 
 //    private boolean isStart;
 //    private static final int VPN_REQUEST_CODE = 0x0F;
@@ -115,24 +119,20 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Intent intent = VpnService.prepare(getActivity());
-        if (intent != null) {
-            //intent
-            startActivityForResult(intent, 0);
-        } else {
-            onActivityResult(0, RESULT_OK, null);
-        }
-
         chooseAccountLayout = view.findViewById(R.id.choose_account_layout);
         insertPasswordLayout = view.findViewById(R.id.insert_password_layout);
         afterSignInLayout = view.findViewById(R.id.status_tab_layout_after_sign_in);
 
         accounts_spinner = view.findViewById(R.id.sp_accounts);
         accounts_list = new ArrayList<>();
-        accounts_list.add("freevpnaccess.com");
-        accounts_list.add("arabi@abc.com");
-        accounts_list.add("nadim@d.com");
-        accounts_list.add("john@xyz.com");
+        accounts_list.add(0, "sayedshuvo@exponentsolution.com");
+        accounts_list.add(1, "mahmudul@exponentsolution.com");
+        accounts_list.add(2, "nafiz.mahmood@exponentsolution.com");
+
+        pinList = new ArrayList<>();
+        pinList.add(0, "0000");
+        pinList.add(1, "1111");
+        pinList.add(2, "2222");
 
         ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, accounts_list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -141,7 +141,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 userId = accounts_list.get(i);
-                //Toast.makeText(getActivity(), "Selected Account: " + userId, Toast.LENGTH_LONG).show();
+                userPin = pinList.get(i);
             }
 
             @Override
@@ -150,15 +150,12 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             }
         });
 
+        accountNameTv = view.findViewById(R.id.account_name_tv);
         readyButton = view.findViewById(R.id.ready_button);
         readyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(userId.equals(USER_ID)) {
-                    readyButtonClicked();
-                } else {
-                    Toast.makeText(getActivity(), "Error: Incorrect User ID!", Toast.LENGTH_LONG).show();
-                }
+                readyButtonClicked();
             }
         });
 
@@ -179,7 +176,7 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
                 mPinForthDigitEditText.setText("");
                 mPinHiddenEditText.setText("");
 
-                if(inputPin.length() == PIN_LENGTH && inputPin.equals(PIN)) {
+                if(inputPin.length() == PIN_LENGTH && inputPin.equals(userPin)) {
                     long loginTimeInMillis = System.currentTimeMillis();
 
                     SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE).edit();
@@ -215,95 +212,17 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
     }
 
     private void readyButtonClicked() {
-        chooseAccountLayout.setVisibility(GONE);
-        //Ekhane Action Hobe
+        accountNameTv.setText(userId);
 
+        chooseAccountLayout.setVisibility(GONE);
         insertPasswordLayout.setVisibility(VISIBLE);
     }
 
-    //Hasan Code
-//    private Handler handler = new Handler(new Handler.Callback() {
-//        @Override
-//        public boolean handleMessage(Message msg) {
-//            return false;
-//        }
-//    });
-//
-//    private Runnable runnable = new Runnable() {
-//        @Override
-//        public void run() {
-//
-//            getActivity().stopService(new Intent(getActivity(), Vpn.class));
-//        }
-//    };
-//
-//
-//    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
-//    {
-//        @Override
-//        public void onReceive(Context context, Intent intent)
-//        {
-//            if (Vpn.BROADCAST_VPN_STATE.equals(intent.getAction()))
-//            {
-//                if (intent.getBooleanExtra("running", false))
-//                {
-//                    isStart = true;
-//
-//                }
-//                else
-//                {
-//                    isStart =false;
-//
-//                    handler.postDelayed(runnable,200);
-//                }
-//            }
-//        }
-//    };
-//
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data)
-//    {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
-//        {
-//            getActivity().startService(new Intent(getActivity(), Vpn.class));
-//        }
-//    }
-//
-//    private void startVPN()
-//    {
-//        Intent vpnIntent = VpnService.prepare(getActivity());
-//        if (vpnIntent != null)
-//        {
-//            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
-//        }
-//        else
-//        {
-//            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
-//        }
-//    }
-//
-//    @Override
-//    public void onDestroy()
-//    {
-//        super.onDestroy();
-//        handler.removeCallbacks(runnable);
-//        getActivity().unregisterReceiver(vpnStateReceiver);
-//    }
-
-//    @Override
-//    public void onActivityResult(int request, int result, Intent data) {
-//
-//        if (result == RESULT_OK) {
-//            SLog.e("vpnServer", "===============");
-//            ToyVpnService.startService(getActivity());
-//            return;
-//        }
-//        SLog.e("vpnServer", "=============");
-//    }
-
     private void signInButtonClicked() {
+        ((MainActivity)getActivity()).signInButtonClicked();
+    }
 
+    public void showAfterSignInLayout() {
         //Code for rx tx
         RX = view.findViewById(R.id.rx);
         TX = view.findViewById(R.id.tx);
@@ -329,11 +248,17 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         afterSignInLayout.setVisibility(VISIBLE);
     }
 
-    private void signOutButtonClicked() {
-        SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(LOGIN_STATUS_SHARED_PREF, false);
-        editor.putString(USER_ID_SHARED_PREF, null);
-        editor.apply();
+    public interface SignOutInterface{
+        void onSignOut();
+    }
+
+    public void signOutButtonClicked() {
+        SignOutInterface signOutInterface = (SignOutInterface) getActivity();
+        signOutInterface.onSignOut();
+    }
+
+    public void afterSignOut() {
+        accountNameTv.setText("");
 
         afterSignInLayout.setVisibility(GONE);
         chooseAccountLayout.setVisibility(VISIBLE);
@@ -347,9 +272,9 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
             RX.setText(Long.toString(rxBytes)+" bytes");
             long txBytes = TrafficStats.getTotalTxBytes() - mStartTX;
             TX.setText(Long.toString(txBytes)+" bytes");
-            double uplinkBytes=((TrafficStats.getTotalRxBytes() - mStartRX)/1024);
+            int uplinkBytes = (int)((TrafficStats.getTotalRxBytes() - mStartRX)/1024);
             uplink.setText(String.valueOf(uplinkBytes)+" Kbps");
-            double downlinkBytes=((TrafficStats.getTotalRxBytes() - mStartRX)/3072);
+            int downlinkBytes = (int)((TrafficStats.getTotalRxBytes() - mStartRX)/3072);
             downlink.setText(String.valueOf(downlinkBytes)+" Kbps");
 
             long currentTime = System.currentTimeMillis();
@@ -577,25 +502,4 @@ public class LandingPageStatusTabFragment extends Fragment implements View.OnFoc
         mPinForthDigitEditText.setOnKeyListener(this);
         mPinHiddenEditText.setOnKeyListener(this);
     }
-
-    /**
-     * Sets background of the view.
-     * This method varies in implementation depending on Android SDK version.
-     *
-     * @param view       View to which set background
-     * @param background Background to set to view
-     */
-    @SuppressWarnings("deprecation")
-    public void setViewBackground(View view, Drawable background) {
-        if (view == null || background == null)
-            return;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            view.setBackground(background);
-        } else {
-            view.setBackgroundDrawable(background);
-        }
-    }
-
-
 }

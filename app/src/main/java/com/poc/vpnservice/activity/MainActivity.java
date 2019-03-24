@@ -3,6 +3,7 @@ package com.poc.vpnservice.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.VpnService;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,14 +17,22 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.poc.vpnservice.R;
 import com.poc.vpnservice.adapter.LandingPageViewPagerAdapter;
+import com.poc.vpnservice.fragment.LandingPageAppsTabFragment;
 import com.poc.vpnservice.fragment.LandingPageServiceTabFragment;
+import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
 import com.poc.vpnservice.service.Vpn;
 
-public class MainActivity extends AppCompatActivity implements LandingPageServiceTabFragment.SignOutInterface {
+import static com.poc.vpnservice.common.Constants.LOGIN_STATUS_SHARED_PREF;
+import static com.poc.vpnservice.common.Constants.MY_SHARED_PREFS_NAME;
+import static com.poc.vpnservice.common.Constants.USER_ID_SHARED_PREF;
+
+public class MainActivity extends AppCompatActivity implements LandingPageServiceTabFragment.SignOutInterface, LandingPageStatusTabFragment.SignOutInterface {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
@@ -32,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
     private static final String[] tabArray = {"STATUS", "SERVICE", "APPS"};//Tab title array
     private boolean isStart;
     private static final int VPN_REQUEST_CODE = 0x0F;
+    LandingPageStatusTabFragment landingPageStatusTabFragment;
+    LandingPageServiceTabFragment landingPageServiceTabFragment;
+    LandingPageAppsTabFragment landingPageAppsTabFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,32 +52,35 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
-        if(!isStart) {
-            //StartService(new Intent(MainActivity.this, Vpn.class));
-            startVPN();
-        }
-        else{
-            sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
-        }
-
-//        LinearLayout l =(LinearLayout) findViewById(R.id.clickable);
-//        l.setOnClickListener(this);
-
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
         viewPager.setOffscreenPageLimit(2);
 
+        landingPageStatusTabFragment = new LandingPageStatusTabFragment();
+        landingPageServiceTabFragment = new LandingPageServiceTabFragment();
+        landingPageAppsTabFragment = new LandingPageAppsTabFragment();
         adapter = new LandingPageViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFrag(landingPageStatusTabFragment, "STATUS");
+        adapter.addFrag(landingPageServiceTabFragment, "SERVICE");
+        adapter.addFrag(landingPageAppsTabFragment, "APPS");
         viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);//setting tab over viewpager
+        tabLayout.setupWithViewPager(viewPager);
 
-        //Implementing tab selected listener over tablayout
+        SharedPreferences prefs = getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE);
+        boolean loginStatus = prefs.getBoolean(LOGIN_STATUS_SHARED_PREF, false);
+
+        if (!loginStatus) {
+            LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
+            tabStrip.setEnabled(false);
+            for (int i = 0; i < tabStrip.getChildCount(); i++) {
+                tabStrip.getChildAt(i).setClickable(false);
+            }
+        }
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());//setting current selected item over viewpager
+                viewPager.setCurrentItem(tab.getPosition());
                 switch (tab.getPosition()) {
                     case 0:
                         Log.e("TAG", "TAB1");
@@ -89,68 +104,35 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
         });
 
         setUpCustomTabs();
-
-//        fabContainerFrameLayout = findViewById(R.id.fabContainerFrameLayout);
-//        fabContainerFrameLayout.setOnClickListener((View.OnClickListener) this);
     }
 
-    private Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            return false;
+    public void signInButtonClicked() {
+        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+        tabStrip.setEnabled(true);
+        for(int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(true);
         }
-    });
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-
-            stopService(new Intent(MainActivity.this, Vpn.class));
-        }
-    };
-
-
-    private BroadcastReceiver vpnStateReceiver = new BroadcastReceiver()
-    {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if (Vpn.BROADCAST_VPN_STATE.equals(intent.getAction()))
-            {
-                if (intent.getBooleanExtra("running", false))
-                {
-                    isStart = true;
-
-                }
-                else
-                {
-                    isStart =false;
-
-                    handler.postDelayed(runnable,200);
-                }
-            }
-        }
-    };
+        startVPN();
+    }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
-        {
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
             startService(new Intent(MainActivity.this, Vpn.class));
+
+            if(null != landingPageStatusTabFragment && landingPageStatusTabFragment.isAdded() && !landingPageStatusTabFragment.isDetached() && !landingPageStatusTabFragment.isRemoving()) {
+                landingPageStatusTabFragment.showAfterSignInLayout();
+            }
         }
     }
 
-    private void startVPN()
-    {
+    public void startVPN() {
         Intent vpnIntent = VpnService.prepare(MainActivity.this);
-        if (vpnIntent != null)
-        {
+        if (vpnIntent != null) {
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
-        }
-        else
-        {
+        } else {
             onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
         }
     }
@@ -167,38 +149,10 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
         }
     }
 
-    //Need to set it
-
-
-//    public void onClick(View view) {
-//        switch (view.getId()) {
-//            case R.id.fabContainerFrameLayout:
-//                Intent intent = Vpn.prepare(MainActivity.this);
-//                if (intent != null) {
-//                    //intent
-//                    startActivityForResult(intent, 0);
-//                } else {
-//                    onActivityResult(0, RESULT_OK, null);
-//                }
-//        }
-//    }
-//
-//    protected void onActivityResult(int request, int result, Intent data) {
-//
-//        if (result == RESULT_OK) {
-//            SLog.e("vpnServer", "===============");
-//            ToyVpnService.startService(this);
-//            return;
-//        }
-//        SLog.e("vpnServer", "=============");
-//    }
-
-    //End here
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -217,46 +171,33 @@ public class MainActivity extends AppCompatActivity implements LandingPageServic
         return super.onOptionsItemSelected(item);
     }
 
-    public void onSignOut(){
-        adapter = new LandingPageViewPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);//setting tab over viewpager
+    public void onSignOut() {
+        SharedPreferences.Editor editor = getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putBoolean(LOGIN_STATUS_SHARED_PREF, false);
+        editor.putString(USER_ID_SHARED_PREF, "");
+        editor.apply();
 
-        //Implementing tab selected listener over tablayout
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());//setting current selected item over viewpager
-                switch (tab.getPosition()) {
-                    case 0:
-                        Log.e("TAG", "TAB1");
-                        break;
-                    case 1:
-                        Log.e("TAG", "TAB2");
-                        break;
-                    case 2:
-                        Log.e("TAG", "TAB3");
-                        break;
-                }
-            }
+        viewPager.setCurrentItem(0);
+        if(null != landingPageStatusTabFragment) {
+            landingPageStatusTabFragment.afterSignOut();
+        }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
+        LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
+        tabStrip.setEnabled(false);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(false);
+        }
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
+        sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
+    }
 
-        setUpCustomTabs();
+    public void onAllowedAppsListChange() {
+        sendBroadcast(new Intent(Vpn.BROADCAST_STOP_VPN));
+        startVPN();
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(runnable);
-        unregisterReceiver(vpnStateReceiver);
     }
 }

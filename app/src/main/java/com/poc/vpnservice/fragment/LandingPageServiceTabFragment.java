@@ -44,10 +44,11 @@ public class LandingPageServiceTabFragment extends Fragment {
                 String userId = prefs.getString(USER_ID_SHARED_PREF, null);
                 if (!TextUtils.isEmpty(userId)) {
                     userIdTv.setText(userId);
+                    signOutButton.setVisibility(VISIBLE);
                 } else {
+                    signOutButton.setVisibility(GONE);
                     Toast.makeText(getActivity(), "Warning: Not logged in!", Toast.LENGTH_SHORT).show();
                 }
-
 
                 serverEndPointTv.setText(SERVER_END_POINT);
             }
@@ -80,16 +81,11 @@ public class LandingPageServiceTabFragment extends Fragment {
     }
 
     private void signOutButtonClicked() {
-        SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_SHARED_PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(LOGIN_STATUS_SHARED_PREF, false);
-        editor.putString(USER_ID_SHARED_PREF, null);
-        editor.apply();
-
         SignOutInterface signOutInterface = (SignOutInterface) getActivity();
         signOutInterface.onSignOut();
     }
 
     public interface SignOutInterface{
-        public void onSignOut();
+        void onSignOut();
     }
 }

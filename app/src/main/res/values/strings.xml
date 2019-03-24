@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VpnService</string>
+    <string name="app_name">Exponent VPN</string>
     <string name="action_settings">Settings</string>
     <string name="connecting">Connecting</string>
     <string name="disconnected">Disconnected</string>
@@ -25,4 +25,7 @@
     <string name="ip_address">IP ADDRESS</string>
     <string name="route">ROUTE</string>
     <string name="dns">DNS</string>
+    <string name="app_list_using_vpn_title">THESE APPS ARE USING VPN</string>
+    <string name="app_list_not_using_vpn_title">THESE APPS DO NOT USE VPN</string>
+    <string name="empty_list">This list is empty</string>
 </resources>

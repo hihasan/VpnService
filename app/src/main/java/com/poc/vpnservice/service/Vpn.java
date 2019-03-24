@@ -36,9 +36,7 @@ import javax.crypto.spec.SecretKeySpec;
 import static com.poc.vpnservice.server.Packet.decrypt;
 import static com.poc.vpnservice.server.Packet.encrypt;
 
-public class Vpn extends VpnService
-{
-
+public class Vpn extends VpnService {
     private static final String TAG = "Vpn";
     public static final String VPN_ADDRESS = "213.229.89.2";
     private static final String VPN_ROUTE = "0.0.0.0";
@@ -50,16 +48,14 @@ public class Vpn extends VpnService
     private ParcelFileDescriptor vpnInterface = null;
     private ExecutorService executorService;
     private VPNRunnable vpnRunnable;
-
+    private String[] appPackages = {};
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
 
         registerReceiver(stopReceiver, new IntentFilter(BROADCAST_STOP_VPN));
         if(setupVPN()) {
-
             sendBroadcast(new Intent(BROADCAST_VPN_STATE).putExtra("running", true));
             vpnRunnable = new VPNRunnable(vpnInterface);
             executorService = Executors.newFixedThreadPool(1);
@@ -67,12 +63,9 @@ public class Vpn extends VpnService
         }
     }
 
-    private boolean setupVPN()
-    {
-        try
-        {
-            if (vpnInterface == null)
-            {
+    private boolean setupVPN() {
+        try {
+            if (vpnInterface == null) {
                 Builder builder = new Builder();
                 builder.addAddress(VPN_ADDRESS, 24);
                 builder.addRoute(VPN_ROUTE, 0);
@@ -83,21 +76,17 @@ public class Vpn extends VpnService
                 builder.setConfigureIntent(pi);
 
                 vpnInterface = builder.setSession(getString(R.string.app_name)).establish();
-
             }
 
             return true;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return false;
     }
 
-    private void stopVpn()
-    {
+    private void stopVpn() {
 
         if(vpnRunnable !=null) {
             vpnRunnable.stop();
@@ -117,18 +106,14 @@ public class Vpn extends VpnService
     }
 
 
-    private BroadcastReceiver stopReceiver = new BroadcastReceiver()
-    {
+    private BroadcastReceiver stopReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if (intent == null || intent.getAction() == null)
-            {
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) {
                 return;
             }
 
-            if (BROADCAST_STOP_VPN.equals(intent.getAction()))
-            {
+            if (BROADCAST_STOP_VPN.equals(intent.getAction())) {
                 onRevoke();
                 stopVpn();
 
@@ -137,8 +122,7 @@ public class Vpn extends VpnService
     };
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
         stopVpn();
         unregisterReceiver(stopReceiver);
@@ -284,11 +268,9 @@ public class Vpn extends VpnService
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
             }
 
         }
-
 
     }
 }

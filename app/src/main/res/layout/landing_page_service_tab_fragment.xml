@@ -18,61 +18,64 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginTop="40dp"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp">
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/username_title"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:text="@string/username"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_alignParentLeft="true"/>
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/user_id"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".6"
                     android:layout_height="wrap_content"
-                    android:text="freevpnaccess.com"
+                    android:text="sayedshuvo@exponentsolution.com"
                     android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                    android:gravity="end"/>
+            </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:text="@string/end_point"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_alignParentLeft="true"/>
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/server_end_point"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".6"
                     android:layout_height="wrap_content"
                     android:text="69.60.121.29"
                     android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                    android:gravity="end"/>
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -83,81 +86,84 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginTop="40dp"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp">
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:text="@string/ip_address"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_alignParentLeft="true"/>
+                    android:textSize="18sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".6"
                     android:layout_height="wrap_content"
                     android:text="172.16.8.3"
                     android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                    android:gravity="end"/>
+            </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:text="@string/route"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_alignParentLeft="true"/>
+                    android:textSize="18sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".6"
                     android:layout_height="wrap_content"
                     android:text="0.0.0.0/0"
                     android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                    android:gravity="end"/>
+            </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:text="@string/dns"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_alignParentLeft="true"/>
+                    android:textSize="18sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".6"
                     android:layout_height="wrap_content"
                     android:text="8.8.8.8"
                     android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                    android:gravity="end"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

@@ -5,12 +5,12 @@ package com.poc.vpnservice.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-
-import com.poc.vpnservice.fragment.LandingPageAppsTabFragment;
-import com.poc.vpnservice.fragment.LandingPageServiceTabFragment;
-import com.poc.vpnservice.fragment.LandingPageStatusTabFragment;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LandingPageViewPagerAdapter extends FragmentPagerAdapter {
+    private final List<Fragment> mFragmentList = new ArrayList<>();
+    private final List<String> mFragmentTitleList = new ArrayList<>();
 
     public LandingPageViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -18,42 +18,21 @@ public class LandingPageViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment = null;
-        if (position == 0)
-        {
-            fragment = new LandingPageStatusTabFragment();
-        }
-        else if (position == 1)
-        {
-            fragment = new LandingPageServiceTabFragment();
-        }
-        else if (position == 2)
-        {
-            fragment = new LandingPageAppsTabFragment();
-        }
-        return fragment;
+        return mFragmentList.get(position);
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return mFragmentList.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        String title = null;
-        if (position == 0)
-        {
-            title = "STATUS";
-        }
-        else if (position == 1)
-        {
-            title = "SERVICE";
-        }
-        else if (position == 2)
-        {
-            title = "APPS";
-        }
-        return title;
+        return mFragmentTitleList.get(position);
+    }
+
+    public void addFrag(Fragment fragment, String title) {
+        mFragmentList.add(fragment);
+        mFragmentTitleList.add(title);
     }
 }
